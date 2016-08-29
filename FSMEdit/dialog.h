@@ -43,9 +43,9 @@ private slots:
 
 private:
 	void contextMenuView(const QPoint& pos, const QPointF& posScene);
-    void contextMenuItem2(const QPoint& pos, StateItem *pItem);
+    void contextMenuState(const QPoint& pos, StateItem *pItem);
 	void contextMenuEventItem(const QPoint& pos, EventItem *pItem);
-	void new_item2(const QPointF& pos);
+    void new_state(const QPointF& pos);
 	void test(const QPoint& pos);
 private:
 	Ui::Dialog *m_ui;

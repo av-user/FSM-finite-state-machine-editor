@@ -23,7 +23,7 @@
 
 const QString Dialog::EVENT_LIST_FILENAME = "events.lst";
 
-void Dialog::new_item2(const QPointF& pos){
+void Dialog::new_state(const QPointF& pos){
     StateDialog stateDlg;
     stateDlg.setModal(true);
     QStringList lst;
@@ -55,13 +55,13 @@ void Dialog::contextMenuView(const QPoint& pos, const QPointF& posScene){
 	QAction* selectedMenuItem = viewMenu.exec(globalPos);
 	if (selectedMenuItem != NULL){
         if (selectedMenuItem->text().compare("New state") == 0){
-			new_item2(posScene);
+            new_state(posScene);
 		}
 	} else {
 		// nothing was chosen
 	}
 }
-void Dialog::contextMenuItem2(const QPoint& pos, StateItem *pItem){
+void Dialog::contextMenuState(const QPoint& pos, StateItem *pItem){
 	QPoint globalPos = m_ui->graphicsView->mapToGlobal(pos);
 	// for QAbstractScrollArea and derived classes you would use:
 	// QPoint globalPos = myWidget->viewport()->mapToGlobal(pos);
@@ -132,7 +132,7 @@ void Dialog::showContextMenu(const QPoint& pos){ // this is a slot
 		int t1 = QGraphicsTextItem::Type;
 		int t2 = QGraphicsItem::Type;
         if (pItem->type() == StateItem::Type){
-            this->contextMenuItem2(pos, qgraphicsitem_cast<StateItem*>(pItem));
+            this->contextMenuState(pos, qgraphicsitem_cast<StateItem*>(pItem));
 		} else if (pItem->type() == EventItem::Type){
 			this->contextMenuEventItem(pos, qgraphicsitem_cast<EventItem*>(pItem));
 		} else {
