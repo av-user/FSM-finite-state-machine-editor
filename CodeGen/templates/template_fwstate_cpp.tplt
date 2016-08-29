@@ -1,0 +1,26 @@
+#include "state%FSM_NAME%.h"
+#include <QDebug>
+#include "../LogLib/logger.h"
+
+%EVENT_EXCEPTIONS%
+
+State%FSM_NAME%*	State%FSM_NAME%::process (StateModel::Msg *pMsg){
+
+	State%FSM_NAME% *pNext_state = nullptr;
+
+	StateModel::Msg::Type type = pMsg->type();
+	Log::Logger::traceV("State%FSM_NAME%", "process msg: %s", pMsg->ToString().toStdString().c_str());
+	switch (type) {
+%EVENT_CASES%
+	default:
+		pNext_state = this;//todo!!!
+		qDebug() << "State%FSM_NAME%::process() msg: " << pMsg->ToString();
+	}
+	return pNext_state;
+}
+
+State%FSM_NAME%::State%FSM_NAME%(%FSM_NAME%Hdl& handler)
+: m_Handler (handler)
+{
+
+}

@@ -1,0 +1,26 @@
+#ifndef %FSM_NAME_U%HDL_H
+#define %FSM_NAME_U%HDL_H
+
+#include <QObject>
+#include "statemodel/handler.h"
+
+%CUSTOM_INCLUDE%
+
+class StateModel::Msg;
+%SIBLING_FSMS_CLASSES%
+
+class %FSM_NAME%Hdl: public StateModel::Handler {
+        Q_OBJECT
+%CUSTOM_PART%
+public:
+
+%SIBLING_FSMS_INTERFACE%
+
+    explicit %FSM_NAME%Hdl(QObject *pParent = 0);
+private:
+    virtual void clear();
+    Q_DISABLE_COPY(%FSM_NAME%Hdl)
+%SIBLING_FSMS%
+    virtual void initialize ();
+};
+#endif // %FSM_NAME_U%HDL_H

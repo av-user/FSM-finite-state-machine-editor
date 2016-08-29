@@ -1,0 +1,38 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/wait.qml</file>
+        <file>qml/ButtonStyleStart.qml</file>
+        <file>qml/Header.qml</file>
+        <file>qml/main.qml</file>
+        <file>qml/start.qml</file>
+        <file>qml/userpass.qml</file>
+        <file>qml/KeyboardNum.qml</file>
+        <file>qml/BtnStyleLabelKbd.qml</file>
+        <file>qml/BtnStyleBgKbd.qml</file>
+        <file>qml/CursorInput.qml</file>
+        <file>qml/LangButton.qml</file>
+        <file>qml/signed.qml</file>
+        <file>qml/buy.qml</file>
+        <file>qml/answer.qml</file>
+        <file>qml/question.qml</file>
+        <file>qml/QuestionButton.qml</file>
+        <file>qml/show.qml</file>
+        <file>qml/BtnStyleWhite.qml</file>
+    </qresource>
+    <qresource prefix="/singletons">
+        <file>singletons/ConstantsSingleton.qml</file>
+        <file>singletons/qmldir</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>images/FlagDe0.png</file>
+        <file>images/FlagEn0.png</file>
+        <file>images/FlagIt0.png</file>
+        <file>images/DemoLogo.png</file>
+    </qresource>
+    <qresource prefix="/texts">
+        <file>texts/sbmain_it.ts</file>
+        <file>texts/sbmain_it.qm</file>
+        <file>texts/sbmain_de.ts</file>
+        <file>texts/sbmain_de.qm</file>
+    </qresource>
+</RCC>

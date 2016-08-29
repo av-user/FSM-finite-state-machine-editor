@@ -1,0 +1,19 @@
+#ifndef STATE%FSM_NAME_U%_H
+#define STATE%FSM_NAME_U%_H
+
+#include "statemodel/state.h"
+
+class %FSM_NAME%Hdl;
+
+class State%FSM_NAME% : public StateModel::State {
+public:
+%EVENT_HANDLERS%
+
+	State%FSM_NAME%(%FSM_NAME%Hdl& handler);
+	virtual State%FSM_NAME%*	process (StateModel::Msg *pMsg);
+
+protected:
+	%FSM_NAME%Hdl	&m_Handler;
+};
+
+#endif // STATE%FSM_NAME_U%_H

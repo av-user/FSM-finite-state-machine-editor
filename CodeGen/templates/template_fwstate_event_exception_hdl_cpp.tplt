@@ -1,0 +1,4 @@
+State%FSM_NAME%* State%FSM_NAME%::do_%EVENT%(StateModel::Msg *pMsg){
+	Log::Logger::trace("State%FSM_NAME%", "do_%EVENT% msg not allowed");
+	throw 0; //todo
+}

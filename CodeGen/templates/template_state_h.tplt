@@ -1,0 +1,18 @@
+#ifndef %STATENAME_UPPER%_H
+#define %STATENAME_UPPER%_H
+#include "./handlers/%FSM_NAME%/Framework/State%FSM_NAME%.h"
+//### <<< custom include beginn
+%CUSTOM_INCLUDE%//### custom include end >>>
+namespace %FSM_NAME% {
+	class %STATE_NAME% : public State%FSM_NAME% {
+//### <<< custom part beginn
+%CUSTOM_PART%//### custom part end >>>
+		static const char *NAME;
+	public:
+		virtual void	initialize ();
+%EVENT_HANDLERS%
+		virtual QString name() const { return NAME; }
+		%STATE_NAME%(%FSM_NAME%Hdl& handler);
+	};
+}
+#endif // %STATENAME_UPPER%_H

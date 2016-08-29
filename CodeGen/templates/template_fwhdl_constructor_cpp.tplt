@@ -1,0 +1,3 @@
+%FSM_NAME%Hdl::%FSM_NAME%Hdl(QObject *pParent)%METHODMARK%: StateModel::Handler ("%FSM_NAME%Hdl", "1.0", pParent)
+{
+}%METHODMARK%

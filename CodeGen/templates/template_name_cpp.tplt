@@ -1,0 +1,1 @@
+const char *%FSM_NAME%::%STATE_NAME%::NAME = "%FSM_NAME%%STATE_NAME%";%NAMEMARK%

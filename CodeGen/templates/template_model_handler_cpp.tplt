@@ -1,0 +1,112 @@
+#include "handler.h"
+#include <QDebug>
+
+#include "state.h"
+#include "msg.h"
+#include "timerthread.h"
+#include "../LogLib/logger.h"
+
+void StateModel::Handler::run(){
+        Log::Logger::traceV("STATMDL", "StateModel::Handler %s started", m_Name.toStdString().c_str());
+        qDebug() << "handler started";
+        m_pTimerThread = new TimerThread (*this);
+        m_pTimerThread->start();
+        connect (this, SIGNAL (startTimerSignal(qint16)), m_pTimerThread, SLOT(startTimer(qint16)));
+        connect (this, SIGNAL (stopTimerSignal()), m_pTimerThread, SLOT(stopTimer()));
+
+        this->initialize();
+        qDebug() << m_Name << " run() thread id: " << QThread::currentThreadId();
+
+        while (true){
+                Msg *pMsg = nextMsg();
+                this->process(pMsg);
+                qDebug() << "StateModel::Handler::run() counter: " << m_Counter++;
+        }
+}
+void StateModel::Handler::reenqueuePend(){
+        Log::Logger::debug("STATMDL", "StateModel::Handler::reenqueuePend()");
+        while (!m_PendQueue.isEmpty()){
+                Log::Logger::debug("STATMDL", "StateModel::Handler::reenqueuePend() message added");
+                m_Queue.enqueue(m_PendQueue.dequeue());
+        }
+}
+void StateModel::Handler::process(StateModel::Msg *pMsg){
+        StateModel::State *pOldState = m_pState;
+        m_pState = m_pState->process(pMsg);
+        qDebug() << "Handler: " << this->name() << " state: " << pOldState->name() << " process(): " << pMsg->ToString();
+        if (m_Pend){
+                this->m_PendQueue.enqueue(pMsg);
+                m_Pend = false;
+        } else {
+                delete pMsg;
+                pMsg = nullptr;
+        }
+        if (m_pState != nullptr){
+                if (pOldState != m_pState){
+                        reenqueuePend ();
+                        m_pState->initialize();
+                        delete pOldState;
+                        pOldState = nullptr;
+                }
+        } else {
+                qDebug() << "Handler::process() nullptr state";
+        }
+        qDebug() << "Handler::process() thread id: " << QThread::currentThreadId();
+}
+void StateModel::Handler::pend (){
+        m_Pend = true;
+}
+void StateModel::Handler::startTimer (int milliseconds){
+        emit this->startTimerSignal(milliseconds);
+        m_TimerStartSignalEmitted = true;
+}
+void StateModel::Handler::stopTimer (){
+        emit this->stopTimerSignal();
+        m_TimerStopSignalEmitted = true;
+}
+
+StateModel::Msg* StateModel::Handler::nextMsg(){
+        m_Mutex.lock();
+        if (m_Queue.isEmpty()){
+                m_QueueNotEmpty.wait(&m_Mutex);
+        }
+        StateModel::Msg *pMsg = m_Queue.dequeue();
+        m_Mutex.unlock();
+        return pMsg;
+}
+void StateModel::Handler::enqueue (StateModel::Msg *pMsg){
+        qDebug() << m_Name << " received msg: " << pMsg->ToString();
+        qDebug() << "Handler::enqueue() thread id: " << QThread::currentThreadId();
+        m_Mutex.lock();
+        this->m_Queue.enqueue(pMsg);
+        m_QueueNotEmpty.wakeAll();
+        m_Mutex.unlock();
+}
+
+const QString StateModel::Handler::name () const {
+        return m_Name;
+}
+const QString StateModel::Handler::state_name () const {
+        return m_pState == nullptr ? "null" : m_pState->name();
+}
+void StateModel::Handler::clear(){
+    // no activity here! this method very probably will be overloaded
+}
+
+StateModel::Handler::Handler(QString name, QString ver, QObject *pParent)
+: QThread	(pParent)
+, m_Name	(name)
+, m_Ver		(ver)
+, m_pState	(nullptr)
+, m_pTimerThread (nullptr)
+, m_TimerStartSignalEmitted (false)
+, m_TimerStopSignalEmitted	(false)
+, m_Pend	(false)
+{
+}
+StateModel::Handler::~Handler(){
+    delete m_pState;
+    delete m_pTimerThread;
+    clear();
+}
+

@@ -1,0 +1,4 @@
+State%FSM_NAME%* %FSM_NAME%::%STATE_NAME%::do_%EVENT% (StateModel::Msg *pMsg){ %HDLMARK%	State%FSM_NAME% *pNewState = nullptr;
+	return pNewState;
+%ALLOWED_RETURNS%
+} %HDLMARK%

@@ -1,0 +1,184 @@
+#include "msg.h"
+#include "state.h"
+#include "handler.h"
+
+#include <QObject>
+
+StateModel::Msg::Type StateModel::Msg::type (){
+    return m_Type;
+}
+
+QString StateModel::Msg::name(){
+    QString str = "invalid";
+    switch (m_Type){
+%ENUM_CASES%
+    default:
+        str = "invalid";
+        break;
+    }
+    return str;
+}
+
+void StateModel::Msg::setVector (const std::vector<unsigned char> *pV){
+    if (pV->empty()){
+        m_Vector.clear();
+    } else {
+        m_Vector.assign (pV->begin(), pV->end());
+    }
+}
+void StateModel::Msg::setVector (std::vector<unsigned char>::const_iterator iBegin, std::vector<unsigned char>::const_iterator iEnd){
+    m_Vector.assign (iBegin, iEnd);
+}
+void StateModel::Msg::appendVector (const std::vector<unsigned char> *pV){
+    m_Vector.insert	(m_Vector.end(), pV->begin(), pV->end());
+}
+void StateModel::Msg::appendVector (std::vector<unsigned char>::const_iterator iBegin, std::vector<unsigned char>::const_iterator iEnd){
+    m_Vector.insert	(m_Vector.end(), iBegin, iEnd);
+}
+
+QString StateModel::Msg::ToString(){
+    QString str = "Msg " + name() + " from: " + m_From;
+    if (!this->m_String.isEmpty()){
+        str += " str: " + m_String.left(10);
+    }
+    if (!this->m_Text.isEmpty()){
+        str += " text: " + m_Text.left(10);
+    }
+    str += " int: " + QString::number(this->m_Int);
+    str += " vector size: " + QString::number(this->m_Vector.size());
+    return str;
+}
+QString StateModel::Msg::str(){
+    return m_String;
+}
+QString StateModel::Msg::text(){
+    return m_Text;
+}
+int StateModel::Msg::i(){
+    return m_Int;
+}
+QObject* StateModel::Msg::obj(){
+    return m_pObject;
+}
+const std::vector<unsigned char>& StateModel::Msg::vect(){
+    return m_Vector;
+}
+void StateModel::Msg::setFrom(const StateModel::Handler *pHdl, const StateModel::State *pState){
+    m_From = pHdl == nullptr ? "nullptr:" : (pHdl->name() + ":");
+    m_From += pState == nullptr ? "nullptr" : pState->name();
+}
+
+StateModel::Msg::Msg(const StateModel::Handler *pHdl, const StateModel::State *pState, Type t)
+: m_Type	(t)
+, m_String	("")
+, m_Int		(-1)
+, m_pObject	(nullptr)
+{
+    setFrom (pHdl, pState);
+}
+
+StateModel::Msg::Msg(const StateModel::Handler *pHdl, const StateModel::State *pState, Type t, QString str)
+: m_Type	(t)
+, m_String	(str)
+, m_Int		(-1)
+, m_pObject	(nullptr)
+{
+    setFrom (pHdl, pState);
+}
+
+StateModel::Msg::Msg(const StateModel::Handler *pHdl, const StateModel::State *pState, Type t, int i)
+: m_Type	(t)
+, m_String	("")
+, m_Int		(i)
+, m_pObject	(nullptr)
+{
+    setFrom (pHdl, pState);
+}
+
+StateModel::Msg::Msg(const StateModel::Handler *pHdl, const StateModel::State *pState, Type t, QObject *pObj)
+: m_Type	(t)
+, m_String	("")
+, m_Int		(-1)
+, m_pObject	(pObj)
+{
+    setFrom (pHdl, pState);
+}
+
+StateModel::Msg::Msg(const StateModel::Handler *pHdl, const StateModel::State *pState, Type t, QString str, QObject *pObj)
+: m_Type	(t)
+, m_String	(str)
+, m_Int		(-1)
+, m_pObject	(pObj)
+{
+    setFrom (pHdl, pState);
+}
+
+StateModel::Msg::Msg(const StateModel::Handler *pHdl, const StateModel::State *pState, Type t, QString str, QString text)
+: m_Type	(t)
+, m_String	(str)
+, m_Text	(text)
+, m_Int		(-1)
+, m_pObject	(nullptr)
+{
+    setFrom (pHdl, pState);
+}
+
+
+StateModel::Msg::Msg(QString from, Type t)
+: m_Type	(t)
+, m_String	("")
+, m_From	(from)
+, m_Int		(-1)
+, m_pObject	(nullptr)
+{
+}
+
+StateModel::Msg::Msg(QString from, Type t, QString str)
+: m_Type	(t)
+, m_String	(str)
+, m_From	(from)
+, m_Int		(-1)
+, m_pObject	(nullptr)
+{
+}
+
+StateModel::Msg::Msg(QString from, Type t, int i)
+: m_Type	(t)
+, m_String	("")
+, m_From	(from)
+, m_Int		(i)
+, m_pObject	(nullptr)
+{
+}
+
+StateModel::Msg::Msg(QString from, Type t, QObject *pObj)
+: m_Type	(t)
+, m_String	("")
+, m_From	(from)
+, m_Int		(-1)
+, m_pObject	(pObj)
+{
+}
+StateModel::Msg::Msg(QString from, Type t, QString str, QObject *pObj)
+: m_Type	(t)
+, m_String	(str)
+, m_From	(from)
+, m_Int		(-1)
+, m_pObject	(pObj)
+{
+}
+StateModel::Msg::Msg(QString from, Type t, QString str, QString text)
+: m_Type	(t)
+, m_String	(str)
+, m_Text	(text)
+, m_From	(from)
+, m_Int		(-1)
+, m_pObject	(nullptr)
+{
+}
+
+StateModel::Msg::~Msg(){
+    delete m_pObject;
+    m_pObject = nullptr;
+}
+

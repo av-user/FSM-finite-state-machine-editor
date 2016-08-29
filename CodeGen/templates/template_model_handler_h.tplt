@@ -1,0 +1,61 @@
+#ifndef STATEMODEL_HANDLER_H
+#define STATEMODEL_HANDLER_H
+
+#include <QThread>
+#include <QString>
+#include <QTimer>
+#include <QWaitCondition>
+#include <QMutex>
+#include <QQueue>
+
+namespace StateModel {
+
+        class State;
+        class Msg;
+        class TimerThread;
+
+        class Handler : public QThread {
+                Q_OBJECT
+        public:
+                const QString name () const;
+                const QString state_name () const;
+                const QString version() const;
+                void enqueue (Msg*);
+                void pend ();
+                void startTimer (int milliseconds);
+                void stopTimer ();
+
+                explicit Handler(QString name, QString ver, QObject *pParent = 0);
+                virtual ~Handler();
+        private:
+
+                Q_DISABLE_COPY(Handler)
+                virtual void process (Msg *pMsg);
+                void reenqueuePend();
+        signals:
+                void startTimerSignal (qint16 milliseconds);
+                void stopTimerSignal();
+        protected slots:
+
+        protected:
+                void run();
+                Msg* nextMsg();
+        virtual void clear();
+                virtual void initialize () = 0;
+
+                QString			m_Ver;
+                QString			m_Name;
+                TimerThread		*m_pTimerThread;
+                QMutex			m_Mutex;
+                QWaitCondition	m_QueueNotEmpty;
+                QQueue<Msg*>	m_Queue;
+                QQueue<Msg*>	m_PendQueue;
+                unsigned long	m_Counter;
+
+                StateModel::State	*m_pState;
+                bool			m_TimerStartSignalEmitted;
+                bool			m_TimerStopSignalEmitted;
+                bool			m_Pend;
+        };
+}
+#endif // STATEMODEL_HANDLER_H

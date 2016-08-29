@@ -1,0 +1,20 @@
+#ifndef STATEMODEL_STATE_H
+#define STATEMODEL_STATE_H
+
+#include "msg.h"
+#include "handler.h"
+
+namespace StateModel {
+
+    class State	{
+
+    public:
+        virtual State*	process (Msg *pMsg) = 0;
+        virtual void	initialize () = 0;
+        virtual QString name() const = 0;
+
+        State();
+    };
+}
+
+#endif // STATEMODEL_STATE_H

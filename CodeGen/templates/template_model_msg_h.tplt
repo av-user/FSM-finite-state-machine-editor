@@ -1,0 +1,60 @@
+#ifndef STATEMODEL_MSG_H
+#define STATEMODEL_MSG_H
+
+#include <QString>
+#include <vector>
+
+class QObject;
+
+namespace StateModel {
+
+    class Handler;
+    class State;
+
+    class Msg {
+    public:
+        enum Type { Undefined = 0
+%ENUM_VALUES%
+        };
+
+        Msg(const StateModel::Handler *pHdl, const StateModel::State *pState, Type t);
+        Msg(const StateModel::Handler *pHdl, const StateModel::State *pState, Type t, QString str);
+        Msg(const StateModel::Handler *pHdl, const StateModel::State *pState, Type t, int i);
+        Msg(const StateModel::Handler *pHdl, const StateModel::State *pState, Type t, QObject *pObj);
+        Msg(const StateModel::Handler *pHdl, const StateModel::State *pState, Type t, QString str, QObject *pObj);
+        Msg(const StateModel::Handler *pHdl, const StateModel::State *pState, Type t, QString str, QString text);
+
+        Msg(const QString from, Type t);
+        Msg(const QString from, Type t, QString str);
+        Msg(const QString from, Type t, int i);
+        Msg(const QString from, Type t, QObject *pObj);
+        Msg(const QString from, Type t, QString str, QObject *pObj);
+        Msg(const QString from, Type t, QString str, QString text);
+        virtual ~Msg();
+
+        void setVector (const std::vector<unsigned char> *pV);
+        void setVector (std::vector<unsigned char>::const_iterator iBegin, std::vector<unsigned char>::const_iterator iEnd);
+        void appendVector (const std::vector<unsigned char> *pV);
+        void appendVector (std::vector<unsigned char>::const_iterator iBegin, std::vector<unsigned char>::const_iterator iEnd);
+
+        const std::vector<unsigned char>& vect();
+        Type type ();
+        QString name();
+        QString str ();
+        QString text ();
+        int i ();
+        QObject* obj ();
+        QString ToString();
+    protected:
+        Type	m_Type;
+        QString m_String;
+        QString m_Text;
+        QString m_From;
+        int		m_Int;
+        QObject *m_pObject;
+        std::vector<unsigned char> m_Vector;
+    private:
+        void setFrom (const StateModel::Handler *pHdl, const StateModel::State *pState);
+    };
+}
+#endif // STATEMODEL_MSG_H

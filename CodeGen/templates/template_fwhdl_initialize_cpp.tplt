@@ -1,0 +1,2 @@
+void %FSM_NAME%Hdl::initialize(){
+}

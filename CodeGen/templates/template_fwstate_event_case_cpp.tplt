@@ -1,0 +1,3 @@
+	case StateModel::Msg::%EVENT%:
+		pNext_state = do_%EVENT%(pMsg);
+		break;

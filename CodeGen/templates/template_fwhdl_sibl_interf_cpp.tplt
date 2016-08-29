@@ -1,0 +1,8 @@
+void %FSM_NAME%Hdl::set%SIBLING%(%SIBLING%Hdl *p%SIBLING%){
+	m_p%SIBLING% = p%SIBLING%;
+}
+void %FSM_NAME%Hdl::notify_%SIBLING%(StateModel::Msg *pMsg) {
+	if (m_p%SIBLING% != nullptr) {
+		m_p%SIBLING%->enqueue(pMsg);
+	}
+}

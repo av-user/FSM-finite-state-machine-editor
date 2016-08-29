@@ -1,0 +1,8 @@
+#include "state.h"
+
+using namespace StateModel;
+
+StateModel::State::State()
+{
+
+}

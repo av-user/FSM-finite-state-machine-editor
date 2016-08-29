@@ -1,0 +1,1 @@
+//	pNewState = new %FSM_NAME%::%STATE_NAME%(this->m_Handler);

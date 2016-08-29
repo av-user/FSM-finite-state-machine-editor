@@ -1,0 +1,11 @@
+#include "%FSM_NAME%hdl.h"
+#include <QDebug>
+#include "statemodel/msg.h"
+#include "../LogLib/logger.h"
+%SIBLING_FSMS_INCLUDES%
+%CUSTOM_INCLUDE%
+%CUSTOM_PART%
+%INITIALIZE%
+%SIBLING_FSMS_INTERFACE%
+%CLEAR%
+%CONSTRUCTOR%

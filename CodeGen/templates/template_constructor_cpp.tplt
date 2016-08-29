@@ -1,0 +1,3 @@
+%FSM_NAME%::%STATE_NAME%::%STATE_NAME%(%FSM_NAME%Hdl& handler)%METHODMARK%: State%FSM_NAME% (handler)
+{
+} %METHODMARK%

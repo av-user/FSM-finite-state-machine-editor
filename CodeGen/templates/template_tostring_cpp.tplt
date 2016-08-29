@@ -1,0 +1,2 @@
+QString %FSM_NAME%::%STATE_NAME%::toString(){%METHODMARK%        return "todo %FSM_NAME%::%STATE_NAME%::ToString()";
+} %METHODMARK%

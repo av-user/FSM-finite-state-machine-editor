@@ -1,0 +1,2 @@
+        void set%FSM_NAME% (%FSM_NAME%Hdl *p%FSM_NAME%);
+        void notify_%FSM_NAME%(StateModel::Msg *pMsg);

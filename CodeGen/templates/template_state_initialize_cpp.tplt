@@ -1,0 +1,2 @@
+void %FSM_NAME%::%STATE_NAME%::initialize (){ %METHODMARK%	Log::Logger::trace("%LOGGER_TAG%", "%STATE_NAME%::initialize ()");
+} %METHODMARK%

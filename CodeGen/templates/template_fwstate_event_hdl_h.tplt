@@ -1,0 +1,1 @@
+	virtual State%FSM_NAME%* do_%EVENT%(StateModel::Msg *pMsg);

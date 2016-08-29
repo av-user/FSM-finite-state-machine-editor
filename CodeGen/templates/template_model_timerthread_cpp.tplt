@@ -1,0 +1,45 @@
+#include "timerthread.h"
+#include "msg.h"
+#include "../LogLib/logger.h"
+#include <QDebug>
+
+void StateModel::TimerThread::run(){
+    Log::Logger::traceV("STATMDL", "TimerThread started in thread %u", QThread::currentThreadId());
+    qDebug() << " TimerThread started in thread " << QThread::currentThreadId();
+    m_pTimer = new StateModel::Timer(m_Handler);
+    m_pTimer->setSingleShot(true);
+    QObject::connect (m_pTimer, SIGNAL (timeout()), m_pTimer, SLOT(timeoutSlot()));
+    QObject::connect (this, SIGNAL (startTimerSignal(int)), m_pTimer, SLOT(start(int)));
+    this->exec();
+}
+
+void StateModel::TimerThread::startTimer (qint16 milliseconds){
+    if (m_pTimer->isActive()){
+        Log::Logger::traceV("STATMDL", "TimerThread startTimer(%u) failed (is active)", milliseconds);
+    } else {
+        emit startTimerSignal((int)milliseconds);
+        Log::Logger::traceV("STATMDL", "TimerThread startTimer(%u) signal emitted", milliseconds);
+    }
+}
+void StateModel::TimerThread::stopTimer (){
+    if (m_pTimer->isActive()){
+        m_pTimer->stop();
+        Log::Logger::trace("STATMDL", "TimerThread stopTimer()");
+    } else {
+        Log::Logger::trace("STATMDL", "TimerThread stopTimer() nothing to stop: not active");
+    }
+}
+
+
+StateModel::TimerThread::TimerThread(Handler &hdl, QObject *pParent)
+: QThread (pParent)
+, m_pTimer (nullptr)
+, m_Handler (hdl)
+{
+
+}
+
+StateModel::TimerThread::~TimerThread(){
+    delete m_pTimer;
+    m_pTimer = nullptr;
+}

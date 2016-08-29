@@ -1,0 +1,23 @@
+#ifndef TIMER_H
+#define TIMER_H
+
+#include <QTimer>
+#include "handler.h"
+
+namespace StateModel {
+
+    class Timer : public QTimer {
+        Q_OBJECT
+    public:
+        explicit Timer(Handler &hdl, QObject *pParent = 0);
+    signals:
+
+    public slots:
+        void timeoutSlot();
+    private:
+        Handler &m_Handler;
+
+    };
+}
+
+#endif // TIMER_H

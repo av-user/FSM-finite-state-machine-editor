@@ -1,0 +1,3 @@
+    case %EVENT_NAME%:
+        str = "%EVENT_NAME%";
+        break;

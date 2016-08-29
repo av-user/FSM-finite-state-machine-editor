@@ -1,0 +1,29 @@
+#ifndef TIMERTHREAD_H
+#define TIMERTHREAD_H
+
+#include <QThread>
+//#include <QTimer>
+#include "timer.h"
+#include "handler.h"
+
+namespace StateModel {
+
+    class TimerThread : public QThread {
+        Q_OBJECT
+    public:
+        void run() Q_DECL_OVERRIDE;
+        explicit TimerThread(Handler &hdl, QObject *pParent = 0);
+        virtual ~TimerThread();
+    signals:
+        void startTimerSignal(int milliseconds);
+    public slots:
+        void startTimer(qint16 milliseconds);
+        void stopTimer ();
+    private:
+        StateModel::Timer	*m_pTimer;
+        Handler &m_Handler;
+    };
+
+}
+
+#endif // TIMERTHREAD_H

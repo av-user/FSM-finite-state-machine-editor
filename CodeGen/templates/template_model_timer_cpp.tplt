@@ -1,0 +1,17 @@
+#include "timer.h"
+#include "../LogLib/logger.h"
+#include "msg.h"
+
+void StateModel::Timer::timeoutSlot(){
+    Log::Logger::trace("STATMDL", "Timer timeoutSlot()");
+    m_Handler.enqueue(new StateModel::Msg ("Timer", StateModel::Msg::Timeout, "timeout"));
+}
+
+
+StateModel::Timer::Timer(Handler &hdl, QObject *pParent)
+: QTimer (pParent)
+, m_Handler (hdl)
+{
+
+
+}
