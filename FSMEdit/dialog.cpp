@@ -49,16 +49,13 @@ void Dialog::contextMenuView(const QPoint& pos, const QPointF& posScene){
 	// for QAbstractScrollArea and derived classes you would use:
 	// QPoint globalPos = myWidget->viewport()->mapToGlobal(pos);
 	QMenu viewMenu;
-	viewMenu.addAction("New item2");
-	viewMenu.addAction("Test");
+    viewMenu.addAction("New state");
 	// ...
 
 	QAction* selectedMenuItem = viewMenu.exec(globalPos);
 	if (selectedMenuItem != NULL){
-		if (selectedMenuItem->text().compare("New item2") == 0){
+        if (selectedMenuItem->text().compare("New state") == 0){
 			new_item2(posScene);
-		} else if (selectedMenuItem->text().compare("Test") == 0){
-			;
 		}
 	} else {
 		// nothing was chosen
