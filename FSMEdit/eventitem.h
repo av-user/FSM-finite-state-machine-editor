@@ -12,12 +12,24 @@ class Transition;
 class Scene;
 
 class EventItem : public QGraphicsRectItem{
+private:
+    static QBrush	SelectedBrush;
+    static QBrush	DefaultBrush;
+    static QColor   EventColorDark;
+    static QColor   EventColorLight;
+    static QPen		BlackPen;
+    static QPen		RedPen;
+
 public:
 	enum { Type = UserType + 4 };
 	int type() const {
 	   return Type;
 	}
     explicit EventItem(StateItem *pTi2, QString name, QFont &font);
+
+    virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *pHoverEvent);
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *pHoverEvent);
+
     void addTransition(StateItem *pEndItem);
 	bool containsTransition (QString endItemName) const;
 	void updateTransitions ();
@@ -35,10 +47,12 @@ public:
     void clearDelayedTransitions() { m_DelayedTransitions.clear(); }
 private:
 	QString m_Name;
+    bool m_Hover;
 	Transition *m_pTransition;
     QSet<StateItem*> m_EndItemsSet;
     QStringList m_DelayedTransitions;
 	Scene *getScene() const;
+    void setHover ();
 };
 
 #endif // EVENTITEM_H

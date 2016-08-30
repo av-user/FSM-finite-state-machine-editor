@@ -6,6 +6,11 @@
 class StateItem;
 
 class Backbone : public QGraphicsPathItem {
+private:
+    static QPen		DefaultPen;
+    static QPen		SelectedPen;
+    static QBrush  DefaultBrush;
+    static QBrush  SelectedBrush;
 public:
 	enum { Type = UserType + 2 };
 	int type() const {
@@ -14,6 +19,7 @@ public:
     explicit Backbone(StateItem *pStartItem, StateItem *pEndItem);
     void rename (QString oldName, QString newName);
 	void updatePosition();
+    void setHover (bool hover);
     const StateItem* const getEndItem () const;
     StateItem* const getStartItem () const;
 	QString getEndItemName () const;

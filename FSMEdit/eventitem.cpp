@@ -1,10 +1,16 @@
 #include <QSet>
+#include <QEvent>
 #include "eventitem.h"
 #include "StateItem.h"
 #include "transition.h"
 #include "backbone.h"
 #include "scene.h"
 #include "../LogLib/logger.h"
+
+QBrush  EventItem::SelectedBrush = QBrush(QColor(255, 10, 10, 15));
+QBrush  EventItem::DefaultBrush;
+QPen    EventItem::BlackPen = QPen(QColor (0,0,0));
+QPen	EventItem::RedPen = QPen(QColor(255, 10, 10));
 
 QString EventItem::toString() const {
 	QString qstr = "event: ";
@@ -86,6 +92,7 @@ void EventItem::updateTransitions (){
 			for (int i = 0; i <= max_idx; i++){
 				if (idx_set.contains(i)){
 					Backbone *pBb = backboneList.at(i);
+                    pBb->setHover (m_Hover);
 					qreal yEnd = mapFromItem (pBb, pBb->getEndPoint()).ry();
 					if (yEnd < y){//up
 						path.lineTo(x + Scene::BevelSize, y - Scene::BevelSize);
@@ -121,6 +128,7 @@ void EventItem::updateTransitions (){
 			}
 		}
 		this->m_pTransition->setPath(path);
+        this->setHover();
 	} else {
 		throw 1;//todo
 	}
@@ -156,14 +164,36 @@ QStringList EventItem::getTransitionList() const {
     }
     return list;
 }
+void EventItem::hoverEnterEvent(QGraphicsSceneHoverEvent *pHoverEvent){
+    m_Hover = true;
+    this->updateTransitions();
+}
+void EventItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *pHoverEvent){
+    m_Hover = false;
+    this->updateTransitions();
+}
+void EventItem::setHover(){
+    if (m_Hover){
+        setPen (EventItem::RedPen);
+        setBrush(EventItem::SelectedBrush);
+    } else {
+        setPen (EventItem::BlackPen);
+        setBrush(EventItem::DefaultBrush);
+    }
+    m_pTransition->setHover(m_Hover);
+}
 EventItem::EventItem(StateItem *pTi2, QString name, QFont &font)
 : QGraphicsRectItem (pTi2)
 , m_pTransition (nullptr)
 , m_Name (name)
+, m_Hover (false)
 {
 	QGraphicsTextItem *pText = new QGraphicsTextItem (name, this);
 	pText->setFont(font);
 	pText->setFlag(QGraphicsItem::ItemNegativeZStacksBehindParent);
 	pText->setZValue(-1);
 	m_pTransition = new Transition (this);
+    setAcceptHoverEvents(true);
+    EventItem::DefaultBrush = brush();
+    setPen(EventItem::BlackPen);
 }

@@ -3,6 +3,11 @@
 #include "scene.h"
 #include "../LogLib/logger.h"
 
+QBrush      Backbone::DefaultBrush;
+QBrush      Backbone::SelectedBrush = QBrush (QColor (255, 10, 10));
+QPen		Backbone::DefaultPen;
+QPen		Backbone::SelectedPen = QPen (SelectedBrush, 3.0);
+
 QString Backbone::toString() const {
 	QString qstr = "start: ";
 	if (m_pStartItem != nullptr){
@@ -42,6 +47,15 @@ QPointF Backbone::getEndPoint() const {
 	} else {
 		throw 1;// todo
 	}
+}
+void Backbone::setHover (bool hover){
+//    if (hover){
+//        setPen(SelectedPen);
+//        setZValue(20);
+//    } else {
+//        setPen(DefaultPen);
+//        setZValue(-2);
+//    }
 }
 void Backbone::updatePath(){
 	if (m_pStartItem != NULL && m_pEndItem != NULL){
@@ -148,5 +162,7 @@ Backbone::Backbone(StateItem *pStartItem, StateItem *pEndItem)
 {
 //	pStartItem->addOutgoingBackbone (this);
 //	pEndItem->addIncomingBackbone(this);
+    DefaultPen = pen();
+    DefaultBrush = brush();
 	updatePath ();
 }
