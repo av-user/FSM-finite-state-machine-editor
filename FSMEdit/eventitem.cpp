@@ -89,13 +89,16 @@ void EventItem::updateTransitions (){
 			path.moveTo(x, y);
 			x += linelen;
 			path.lineTo(x, y);
+            StateItem *pStateItem = qgraphicsitem_cast <StateItem*>(parentItem());
 			for (int i = 0; i <= max_idx; i++){
 				if (idx_set.contains(i)){
-					Backbone *pBb = backboneList.at(i);
+                    Backbone *pBb = backboneList.at(i);
                     pBb->setHover (m_Hover);
-					qreal yEnd = mapFromItem (pBb, pBb->getEndPoint()).ry();
+                    QPointF bbstartoffset = mapFromItem(pStateItem, pStateItem->getBackboneStartOffset (pBb));
+                    qreal yEnd = mapFromItem (pBb, pBb->getEndPoint()).ry();
 					if (yEnd < y){//up
 						path.lineTo(x + Scene::BevelSize, y - Scene::BevelSize);
+                        path.lineTo(x + Scene::BevelSize, bbstartoffset.ry());
 						if (i != max_idx){
 							path.moveTo(x, y);
 							x += Scene::BackboneMargin;
@@ -103,6 +106,7 @@ void EventItem::updateTransitions (){
 						}
 					} else if (yEnd > y){//down
 						path.lineTo(x + Scene::BevelSize, y + Scene::BevelSize);
+                        path.lineTo(x + Scene::BevelSize, bbstartoffset.ry());
 						if (i != max_idx){
 							path.moveTo(x, y);
 							x += Scene::BackboneMargin;
@@ -110,13 +114,14 @@ void EventItem::updateTransitions (){
 						}
 					} else {//right
 						path.lineTo(x + Scene::BevelSize, y);
+                        path.lineTo(x + Scene::BevelSize, bbstartoffset.ry());
 						if (i != max_idx){
 							x += Scene::BackboneMargin - Scene::BevelSize;
 							path.lineTo(x, y);
 						}
 					}
 				} else {
-					bool collides = pParentItem->eventTransitionCollidesWithBackbone(this, i);
+                    bool collides = pParentItem->eventTransitionCollidesWithBackbone(this, i);
 					if (collides){
 						path.arcTo(x, y - Scene::BevelSize, Scene::BevelSize*2, Scene::BevelSize*2, 180, 180);
 					} else {
@@ -180,7 +185,7 @@ void EventItem::setHover(){
         setPen (EventItem::BlackPen);
         setBrush(EventItem::DefaultBrush);
     }
-    m_pTransition->setHover(m_Hover);
+//    m_pTransition->setHover(m_Hover);
 }
 EventItem::EventItem(StateItem *pTi2, QString name, QFont &font)
 : QGraphicsRectItem (pTi2)

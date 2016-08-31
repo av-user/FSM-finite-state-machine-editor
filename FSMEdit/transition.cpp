@@ -16,13 +16,13 @@ QString Transition::toString() const {
 	return qstr;
 }
 void Transition::setHover (bool hover){
-    if (hover){
-        setPen(SelectedPen);
-        setZValue(20);
-    } else {
-        setPen(DefaultPen);
-        setZValue(-2);
-    }
+//    if (hover){
+//        setPen(SelectedPen);
+//        setZValue(20);
+//    } else {
+//        setPen(DefaultPen);
+//        setZValue(-2);
+//    }
 }
 Transition::Transition(EventItem *pEventItem/*, const QString endItemName*/)
 : QGraphicsPathItem (pEventItem)

@@ -119,7 +119,12 @@ const EventItem* StateItem::getLowerEvent (QString endItemName) const{
 }
 QPointF StateItem::getBackboneStartOffset(Backbone const* pBackbone) const{
 // offset from (0,0) point of this item
+// 30.08.2016 to this point the backbone ran from the lowest event up,
+// or from highest down. now we change it so that it will begin at the
+// lowest if goes down, and every transition will run until the backbone's
+// start point. otherwise highlighting would be very complex.
 	QPointF	pnt;
+    QPointF bbendpnt;
     Log::Logger::debugV("PAINT__", "StateItem::getBackboneStartOffset() this: %s", this->toString().toStdString().c_str());
 	const EventItem *pEventItem = nullptr;
     StateItem::BackboneDirection bbdir = this->getBackboneDirection(pBackbone);
@@ -128,15 +133,15 @@ QPointF StateItem::getBackboneStartOffset(Backbone const* pBackbone) const{
 	switch (bbdir){
     case StateItem::Up:
         Log::Logger::debug("PAINT__", "StateItem::getBackboneStartOffset() up");
-		pEventItem = getLowerEvent (pBackbone->getEndItemName());
+        pEventItem = getUpperEvent(pBackbone->getEndItemName());
 		if (pEventItem != NULL){// may not be null, but we'll check it
             Log::Logger::debugV("PAINT__", "StateItem::getBackboneStart() lower event: %s", pEventItem->toString().toStdString().c_str());
-			pnt.ry()+= pEventItem->pos().y() + pEventItem->rect().height()/2;
+            pnt.setY(pEventItem->pos().y() + pEventItem->rect().height()/2);
 		}
 		break;
     case StateItem::Down:
         Log::Logger::debug("PAINT__", "StateItem::getBackboneStartOffset() down");
-		pEventItem = getUpperEvent (pBackbone->getEndItemName());
+        pEventItem = getLowerEvent (pBackbone->getEndItemName());
 		if (pEventItem != NULL){// may not be null, but we'll check it
             Log::Logger::debugV("PAINT__", "StateItem::getBackboneStartOffset() upper event: %s", pEventItem->toString().toStdString().c_str());
 			pnt.setY (pEventItem->pos().y() + pEventItem->rect().height()/2);
@@ -144,11 +149,9 @@ QPointF StateItem::getBackboneStartOffset(Backbone const* pBackbone) const{
 		break;
     case StateItem::UpDown:
         Log::Logger::debug("PAINT__", "StateItem::getBackboneStartOffset() updown");
-		pEventItem = getUpperEvent (pBackbone->getEndItemName());
-		if (pEventItem != NULL){// may not be null, but we'll check it
-            Log::Logger::debugV("PAINT__", "StateItem::getBackboneStartOffset() upper event: %s", pEventItem->toString().toStdString().c_str());
-			pnt.ry() += pEventItem->pos().y() + pEventItem->rect().height()/2;
-		}
+        bbendpnt = mapFromItem(pBackbone, pBackbone->getEndPoint(this->getWidth() + Scene::BackboneMargin*(idx+1)));
+        Log::Logger::debugV("PAINT__", "StateItem::getBackboneStartOffset() bbendpnt: %6.2f, %6.2f", bbendpnt.rx(), bbendpnt.ry());
+        pnt.setY(bbendpnt.ry());
 		break;
 	default:
 		break;
@@ -448,42 +451,42 @@ bool StateItem::eventTransitionCollidesWithBackbone(EventItem *pEventItem, int b
 	bool collides = false;
 	bool aboveGivenEventItem = true;
 	bool eventOnBackboneFound = false;
-	const Backbone *pBackbone = getScene()->getOutBackbone(backboneIdx);
-	if (pBackbone != nullptr){
-		qreal yEnd = mapFromItem (pBackbone, pBackbone->getEndPoint()).ry();
-		qreal yEventItem = pEventItem->pos().ry() + pEventItem->rect().height()/2;
-		foreach (QGraphicsItem *pGrItem, childItems()){
-			if (pGrItem->type() == EventItem::Type){
-				EventItem *pEvIt = qgraphicsitem_cast<EventItem*>(pGrItem);
-				if (pEvIt == pEventItem){
-					aboveGivenEventItem = false;
-					// given item reached
-					if (eventOnBackboneFound && yEnd >= pEventItem->pos().ry() + pEventItem->rect().height()/2){
-						collides = true;
-						break;
-					}
-				} else if (aboveGivenEventItem){
-					if (!eventOnBackboneFound){
-						eventOnBackboneFound = pEvIt->containsTransition(pBackbone->getEndItemName());
-					}
-				} else {
-					// we are below given item
-					if (pEvIt->containsTransition(pBackbone->getEndItemName())){
-						if (eventOnBackboneFound){
-							collides = true;
-							break;
-						} else {
-							eventOnBackboneFound = true;// does not matter, but...
-							collides = yEnd < yEventItem;
-							break;
-						}
-					} else {
-						;//todo?
-					}
-				}
-			}
-		}
-	}
+    const Backbone *pBackbone = getScene()->getOutBackbone(this->m_Name, backboneIdx);
+    if (pBackbone != nullptr){
+        qreal yEnd = mapFromItem (pBackbone, pBackbone->getEndPoint()).ry();
+        qreal yEventItem = pEventItem->pos().ry() + pEventItem->rect().height()/2;
+        foreach (QGraphicsItem *pGrItem, childItems()){
+            if (pGrItem->type() == EventItem::Type){
+                EventItem *pEvIt = qgraphicsitem_cast<EventItem*>(pGrItem);
+                if (pEvIt == pEventItem){
+                    aboveGivenEventItem = false;
+                    // given item reached
+                    if (eventOnBackboneFound && yEnd >= pEventItem->pos().ry() + pEventItem->rect().height()/2){
+                        collides = true;
+                        break;
+                    }
+                } else if (aboveGivenEventItem){
+                    if (!eventOnBackboneFound){
+                        eventOnBackboneFound = pEvIt->containsTransition(pBackbone->getEndItemName());
+                    }
+                } else {
+                    // we are below given item
+                    if (pEvIt->containsTransition(pBackbone->getEndItemName())){
+                        if (eventOnBackboneFound){
+                            collides = true;
+                            break;
+                        } else {
+                            eventOnBackboneFound = true;// does not matter, but...
+                            collides = yEnd < yEventItem;
+                            break;
+                        }
+                    } else {
+                        ;//todo?
+                    }
+                }
+            }
+        }
+    }
 	return collides;
 }
 void StateItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){

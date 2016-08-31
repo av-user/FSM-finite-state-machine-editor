@@ -24,10 +24,13 @@ public:
     StateItem* const getStartItem () const;
 	QString getEndItemName () const;
 	QPointF getEndPoint() const;
+    QPointF getEndPoint(qreal startX) const;
 	QString toString() const;
     bool isLoop () const;
 private:
 	void updatePath();
+    void updatePathUnbeveled(QPointF pointStart, QPointF pointEnd);
+    void drawArrow (QPainterPath *pPath, QPointF pointStart, QPointF pointEnd);
     StateItem *m_pStartItem;
     const StateItem *m_pEndItem;
 };

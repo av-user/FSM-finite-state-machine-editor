@@ -21,7 +21,7 @@ SOURCES += main.cpp\
     transition.cpp \
     eventdialog.cpp \
     statedialog.cpp \
-    statetem.cpp
+    stateitem.cpp
 
 HEADERS  += dialog.h \
     scene.h \

@@ -119,6 +119,7 @@ QStringList Scene::getItemList () const {
             list.append(qgraphicsitem_cast<StateItem*>(pItem)->getName());
 		}
 	}
+    qSort(list);
 	return list;
 }
 StateItem* Scene::getItem (QString name){
@@ -252,19 +253,24 @@ QList<Backbone*> Scene::getOutBackboneList (QString startItemName) const {
 			}
 		}
 	}
+    qSort(list);
 	return list;
 }
-const Backbone* Scene::getOutBackbone (int idx) const {
+const Backbone* Scene::getOutBackbone (QString statename, int idx) const {
 	Backbone *pBackbone = nullptr;
-	int i = -1;
-	foreach (QGraphicsItem *pGrItem , this->views().first()->items()) {
-		if (pGrItem->type() == Backbone::Type){
-			if (++i == idx){
-				pBackbone = qgraphicsitem_cast<Backbone*>(pGrItem);
-				break;
-			}
-		}
-	}
+    QList<Backbone*> list = getOutBackboneList (statename);
+    if (idx < list.count()){
+        pBackbone = list.at(idx);
+    }
+//	int i = -1;
+//	foreach (QGraphicsItem *pGrItem , this->views().first()->items()) {
+//		if (pGrItem->type() == Backbone::Type){
+//			if (++i == idx){
+//				pBackbone = qgraphicsitem_cast<Backbone*>(pGrItem);
+//				break;
+//			}
+//		}
+//	}
 	return pBackbone;
 }
 bool Scene::backboneExists (QString startItemName, QString endItemName) const {
@@ -291,6 +297,7 @@ QList<Backbone*> Scene::getInBackboneList (QString endItemName) const {
 			}
 		}
 	}
+    qSort (list);
 	return list;
 }
 void Scene::createBackbone(EventItem *pStartEventItem, StateItem *pEndItem){

@@ -26,7 +26,7 @@ public:
 	QStringList getItemList () const ;
     void renameItem (QString oldName, QString newName);
 	QList<Backbone*> getOutBackboneList (QString startItemName) const ;
-	const Backbone* getOutBackbone (int idx) const ;
+    const Backbone* getOutBackbone (QString statename, int idx) const ;
 	bool backboneExists (QString startItemName, QString endItemName) const ;
 	QList<Backbone*> getInBackboneList (QString endItemName) const ;
 	enum State { InsertLine, MoveItem, Undefined, };
