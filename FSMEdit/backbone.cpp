@@ -115,84 +115,32 @@ void Backbone::updatePathUnbeveled(QPointF pointStart, QPointF pointEnd){
 void Backbone::updatePath(){
 	if (m_pStartItem != NULL && m_pEndItem != NULL){
 		QPainterPath myPath;
-        StateItem::BackboneDirection direction = m_pStartItem->getBackboneDirection(this);
 		QPointF pointStart = mapFromItem (m_pStartItem, m_pStartItem->getBackboneStartOffset(this));
 		Log::Logger::debugV("PAINT__", "Backbone::updatePath() pointStart (%5.2f, %5.2f)", pointStart.rx(), pointStart.ry());
         QPointF pointEnd = this->getEndPoint();
-        if (abs (pointStart.ry() - pointEnd.ry()) < Scene::BevelSize){
-            updatePathUnbeveled(pointStart, pointEnd);
-        } else {
-            switch (direction){
-            case StateItem::Up:
-                pointStart.ry() -= Scene::BevelSize;
-                break;
-            case StateItem::Down:
-                pointStart.ry() += Scene::BevelSize;
-                break;
-            case StateItem::UpDown:
-                break;
-            default:
-                throw 1;//todo
-            }
-        }
-		myPath.moveTo(pointStart);
-//        QPointF pointEnd = this->getEndPoint();
 		QPointF pnt;
-		pnt.rx() = pointStart.rx();
-		pnt.ry() = pointEnd.ry();
-        if (pointEnd.rx() == pointStart.rx()){
-             myPath.lineTo(pnt.x(), pnt.y());
+        qreal diffY = pointEnd.ry() - pointStart.ry();
+        if (diffY == 0.0){
+            myPath.moveTo(pointStart.rx(), pointStart.ry());
+        } else if (abs(diffY) < Scene::BevelSize){
+            myPath.moveTo(pointStart.rx(), pointEnd.ry());
+        } else if (diffY < -Scene::BevelSize*2){ // up
+            myPath.moveTo(pointStart.rx(), pointStart.ry() - Scene::BevelSize);
+            myPath.lineTo(pointStart.rx(), pointEnd.ry() + Scene::BevelSize);
+            myPath.lineTo(pointStart.rx() + Scene::BevelSize, pointEnd.ry());
+        } else if (diffY < -Scene::BevelSize){ // "half up"
+            myPath.moveTo(pointStart.rx(), pointStart.ry() - Scene::BevelSize);
+            myPath.lineTo(pointStart.rx() - diffY - Scene::BevelSize, pointEnd.ry());
+        } else if (diffY < Scene::BevelSize*2){
+            myPath.moveTo(pointStart.rx(), pointStart.ry() + Scene::BevelSize);
+            myPath.lineTo(pointStart.rx() + diffY - Scene::BevelSize, pointEnd.ry());
         } else {
-            switch (direction){
-            case StateItem::UpDown:
-                break;
-            case StateItem::Up:
-                myPath.lineTo(pnt.x(), pnt.y() + Scene::BevelSize);
-                if (pointEnd.x() > pnt.x()){
-                    myPath.lineTo(pnt.x() + Scene::BevelSize, pnt.y());
-                } else {
-                    myPath.lineTo(pnt.x() - Scene::BevelSize, pnt.y());
-                }
-                break;
-            case StateItem::Down:
-                myPath.lineTo(pnt.x(), pnt.y() - Scene::BevelSize);
-                if (pointEnd.x() > pnt.x()){
-                    myPath.lineTo(pnt.x() + Scene::BevelSize, pnt.y());
-                } else {
-                    myPath.lineTo(pnt.x() - Scene::BevelSize, pnt.y());
-                }
-                break;
-            default:
-                throw 1;//todo
-                break;
-            }
+            myPath.moveTo(pointStart.rx(), pointStart.ry() + Scene::BevelSize);
+            myPath.lineTo(pointStart.rx(), pointEnd.ry() - Scene::BevelSize);
+            myPath.lineTo(pointStart.rx() + Scene::BevelSize, pointEnd.ry());
         }
-		Log::Logger::debugV("PAINT__", "Backbone::updatePath() pnt (%5.2f, %5.2f)", pnt.rx(), pnt.ry());
 		myPath.lineTo(pointEnd);
-
         drawArrow(&myPath, pointStart, pointEnd);
-//        //draw arrow
-//        if (pointEnd.rx() == pointStart.rx()){
-//            if (pointEnd.ry() > pointStart.ry() - Scene::ArrowSize){ // down
-//                myPath.lineTo(pointEnd.rx() - Scene::ArrowSize/2, pointEnd.ry() - Scene::ArrowSize);
-//                myPath.moveTo(pointEnd);
-//                myPath.lineTo(pointEnd.rx() + Scene::ArrowSize/2, pointEnd.ry() - Scene::ArrowSize);
-//            } else if (pointEnd.ry() < pointStart.ry() + Scene::ArrowSize){ // up
-//                myPath.lineTo(pointEnd.rx() - Scene::ArrowSize/2, pointEnd.ry() + Scene::ArrowSize);
-//                myPath.moveTo(pointEnd);
-//                myPath.lineTo(pointEnd.rx() + Scene::ArrowSize/2, pointEnd.ry() + Scene::ArrowSize);
-//            }
-//        } else {
-//            if (pointEnd.rx() > pointStart.rx() + Scene::ArrowSize){ // right
-//                myPath.lineTo(pointEnd.rx() - Scene::ArrowSize, pointEnd.ry() - Scene::ArrowSize/2);
-//                myPath.moveTo(pointEnd);
-//                myPath.lineTo(pointEnd.rx() - Scene::ArrowSize, pointEnd.ry() + Scene::ArrowSize/2);
-//            } else if (pointEnd.rx() < pointStart.rx() - Scene::ArrowSize){ // left
-//                myPath.lineTo(pointEnd.rx() + Scene::ArrowSize, pointEnd.ry() - Scene::ArrowSize/2);
-//                myPath.moveTo(pointEnd);
-//                myPath.lineTo(pointEnd.rx() + Scene::ArrowSize, pointEnd.ry() + Scene::ArrowSize/2);
-//            }
-//        }
 		Log::Logger::debugV("PAINT__", "Backbone::updatePath() pointEnd (%5.2f, %5.2f)", pointEnd.rx(), pointEnd.ry());
 		setPath(myPath);
 	}

@@ -12,7 +12,7 @@
 qreal Scene::BackboneMargin = 30.0;
 qreal Scene::BevelSize = 5.0;
 qreal Scene::RectRadius = 10.0;
-qreal Scene::ArrowSize = 10.0;
+qreal Scene::ArrowSize = 12.0;
 //QBrush Scene::StateBrush = QBrush(QColor(250, 248, 248));
 QColor Scene::StateColorDark (232, 223, 223);
 QColor Scene::StateColorLight (255, 254, 254);
@@ -262,15 +262,6 @@ const Backbone* Scene::getOutBackbone (QString statename, int idx) const {
     if (idx < list.count()){
         pBackbone = list.at(idx);
     }
-//	int i = -1;
-//	foreach (QGraphicsItem *pGrItem , this->views().first()->items()) {
-//		if (pGrItem->type() == Backbone::Type){
-//			if (++i == idx){
-//				pBackbone = qgraphicsitem_cast<Backbone*>(pGrItem);
-//				break;
-//			}
-//		}
-//	}
 	return pBackbone;
 }
 bool Scene::backboneExists (QString startItemName, QString endItemName) const {

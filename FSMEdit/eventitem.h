@@ -7,6 +7,7 @@
 #include <QDomElement>
 
 class StateItem;
+class Backbone;
 class QPointF;
 class Transition;
 class Scene;
@@ -52,6 +53,9 @@ private:
     QSet<StateItem*> m_EndItemsSet;
     QStringList m_DelayedTransitions;
 	Scene *getScene() const;
+    void transitionUp (QPainterPath *pPath, QPointF me, qreal bbY, Backbone *pBB, bool lastbackbone);
+    void transitionDown (QPainterPath *pPath, QPointF me, qreal bbY, Backbone *pBB, bool lastbackbone);
+    void transitionRight (QPainterPath *pPath, QPointF me, qreal bbY, Backbone *pBB, bool lastbackbone);
     void setHover ();
 };
 

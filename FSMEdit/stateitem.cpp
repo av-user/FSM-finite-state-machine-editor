@@ -119,44 +119,27 @@ const EventItem* StateItem::getLowerEvent (QString endItemName) const{
 }
 QPointF StateItem::getBackboneStartOffset(Backbone const* pBackbone) const{
 // offset from (0,0) point of this item
-// 30.08.2016 to this point the backbone ran from the lowest event up,
-// or from highest down. now we change it so that it will begin at the
-// lowest if goes down, and every transition will run until the backbone's
-// start point. otherwise highlighting would be very complex.
+// 31.08.2016 if endpoint y is heigher as the middle of the upper
+// event plus bevel, backbone beginns just at this point (middle upper + bevel)
+// similarly at the bottom.
+// otherwize bachbone starts at the same ordinate as the endpoint
+// x calculated as bb index * Scene::BackboneMargin
 	QPointF	pnt;
-    QPointF bbendpnt;
     Log::Logger::debugV("PAINT__", "StateItem::getBackboneStartOffset() this: %s", this->toString().toStdString().c_str());
-	const EventItem *pEventItem = nullptr;
-    StateItem::BackboneDirection bbdir = this->getBackboneDirection(pBackbone);
-	int idx = getOutgoingBackboneIndex(pBackbone);
-    Log::Logger::debugV("PAINT__", "StateItem::getBackboneStart() idx: %d", idx);
-	switch (bbdir){
-    case StateItem::Up:
-        Log::Logger::debug("PAINT__", "StateItem::getBackboneStartOffset() up");
-        pEventItem = getUpperEvent(pBackbone->getEndItemName());
-		if (pEventItem != NULL){// may not be null, but we'll check it
-            Log::Logger::debugV("PAINT__", "StateItem::getBackboneStart() lower event: %s", pEventItem->toString().toStdString().c_str());
-            pnt.setY(pEventItem->pos().y() + pEventItem->rect().height()/2);
-		}
-		break;
-    case StateItem::Down:
-        Log::Logger::debug("PAINT__", "StateItem::getBackboneStartOffset() down");
-        pEventItem = getLowerEvent (pBackbone->getEndItemName());
-		if (pEventItem != NULL){// may not be null, but we'll check it
-            Log::Logger::debugV("PAINT__", "StateItem::getBackboneStartOffset() upper event: %s", pEventItem->toString().toStdString().c_str());
-			pnt.setY (pEventItem->pos().y() + pEventItem->rect().height()/2);
-		}
-		break;
-    case StateItem::UpDown:
-        Log::Logger::debug("PAINT__", "StateItem::getBackboneStartOffset() updown");
-        bbendpnt = mapFromItem(pBackbone, pBackbone->getEndPoint(this->getWidth() + Scene::BackboneMargin*(idx+1)));
-        Log::Logger::debugV("PAINT__", "StateItem::getBackboneStartOffset() bbendpnt: %6.2f, %6.2f", bbendpnt.rx(), bbendpnt.ry());
-        pnt.setY(bbendpnt.ry());
-		break;
-	default:
-		break;
-	}
-	pnt.setX(this->getWidth() + Scene::BackboneMargin*(idx+1));
+    int idx = getOutgoingBackboneIndex(pBackbone);
+    if (idx != -1){
+        pnt.setX(this->getWidth() + Scene::BackboneMargin*(idx+1));
+        qreal endbbY = mapFromItem(parentItem(), pBackbone->getEndPoint(pnt.rx())).ry();
+        qreal myHighY = mapFromItem(parentItem(), QPointF(0, getHY(pBackbone))).ry();
+        qreal myLowY = mapFromItem(parentItem(), QPointF(0, getLY(pBackbone))).ry();
+        if (endbbY < myHighY){
+            pnt.setY(myHighY);
+        } else if (endbbY > myLowY){
+            pnt.setY(myLowY);
+        } else {
+            pnt.setY(endbbY);
+        }
+    }
 	return pnt;
 }
 QPointF StateItem::getBackboneStartLow(Backbone const* pBackbone) const{
@@ -187,7 +170,7 @@ int StateItem::getOutgoingBackboneIndex(const Backbone *  pBackbone) const{
 	}
 	return idx;
 }
-double StateItem::myHY (const Backbone *pBackbone) const {
+double StateItem::getHY (const Backbone *pBackbone) const {
 	double y = this->pos().y();
 	const EventItem *pEvent = getUpperEvent (pBackbone->getEndItemName());
 	if (pEvent != nullptr){
@@ -197,7 +180,7 @@ double StateItem::myHY (const Backbone *pBackbone) const {
 	}
 	return y;
 }
-double StateItem::myLY (const Backbone *pBackbone) const {
+double StateItem::getLY (const Backbone *pBackbone) const {
 	double y = this->pos().y();
 	const EventItem *pEvent = getLowerEvent (pBackbone->getEndItemName());
 	if (pEvent != nullptr){
@@ -210,8 +193,8 @@ double StateItem::myLY (const Backbone *pBackbone) const {
 StateItem::BackboneDirection StateItem::getBackboneDirection(const Backbone *pBackbone) const {
 	BackboneDirection direction = Up;
 	double endY = pBackbone->getEndItem()->pos().ry();
-	double myHighY = myHY (pBackbone);
-	double myLowY = myLY (pBackbone);
+    double myHighY = getHY (pBackbone);
+    double myLowY = getLY (pBackbone);
     Log::Logger::debugV("PAINT__", "StateItem::getBackboneDirection() endY: %6.2f, myHY: %6.2f, myLY: %6.2f"
 	, endY, myHighY, myLowY);
 	if (myHighY > endY){
@@ -271,7 +254,7 @@ void StateItem::updateEvents (){
 			}
 		}
 	}
-	int h = Margin + fm.height() + Space;
+    int h = Margin + fm.height() + Space;
 	foreach (QGraphicsItem *pGrItem, this->childItems()){
 		if (pGrItem->type() == EventItem::Type){
 			EventItem *pEvItem = qgraphicsitem_cast<EventItem*>(pGrItem);

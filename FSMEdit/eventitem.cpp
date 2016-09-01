@@ -65,7 +65,83 @@ QString EventItem::serialize() const {
 Scene* EventItem::getScene() const {
 	return dynamic_cast<Scene*>(scene());
 }
+void EventItem::transitionUp (QPainterPath *pPath, QPointF me, qreal bbY, Backbone *pBB, bool lastbackbone){
+    StateItem *pStateItem = qgraphicsitem_cast<StateItem*>(parentItem());
+    qreal myTopY = mapFromItem(parentItem()->parentItem(), QPointF(0, pStateItem->getHY(pBB))).ry();
+    qreal diffY = myTopY - me.ry();
+    qreal distance2bb = myTopY - bbY;
+    if (diffY < 0){ // there are other transitions with the same bb up from me
+        distance2bb = me.ry() - bbY;
+        if (distance2bb < Scene::BevelSize){
+            pPath->lineTo(me.rx() + Scene::BevelSize, bbY);
+        } else {
+            pPath->lineTo(me.rx() + Scene::BevelSize, me.ry() - Scene::BevelSize);
+            distance2bb = myTopY - bbY;
+            if (distance2bb < 0){
+                pPath->lineTo(me.rx() + Scene::BevelSize, bbY);
+            } else {
+                if (distance2bb > Scene::BevelSize){
+                    pPath->lineTo(me.rx() + Scene::BevelSize, myTopY - Scene::BevelSize);
+                } else {
+                    pPath->lineTo(me.rx() + Scene::BevelSize, bbY);
+                }
+            }
+        }
+    } else if (diffY == 0){ // i am the top
+        pPath->lineTo(me.rx() + Scene::BevelSize, myTopY
+                      - (distance2bb > Scene::BevelSize ? Scene::BevelSize : distance2bb));
+    }
+    if (!lastbackbone){
+        pPath->moveTo(me.rx(), me.ry());
+        me.rx() += Scene::BackboneMargin;
+        pPath->lineTo(me.rx(), me.ry());
+    }
+}
+void EventItem::transitionDown (QPainterPath *pPath, QPointF me, qreal bbY, Backbone *pBB, bool lastbackbone){
+    StateItem *pStateItem = qgraphicsitem_cast<StateItem*>(parentItem());
+    qreal myBottomY = mapFromItem(parentItem()->parentItem(), QPointF(0, pStateItem->getLY(pBB))).ry();
+    qreal diffY = myBottomY - me.ry();
+    qreal distance2bb = 0;
+    if (diffY > 0){ // there are other transitions with the same bb down from me
+        distance2bb = bbY - me.ry();
+        if (distance2bb < Scene::BevelSize){
+            pPath->lineTo(me.rx() + Scene::BevelSize, bbY);
+        } else {
+            pPath->lineTo(me.rx() + Scene::BevelSize, me.ry() + Scene::BevelSize);
+            distance2bb = myBottomY - bbY;
+            if (distance2bb > 0){
+                pPath->lineTo(me.rx() + Scene::BevelSize, bbY);
+            } else {
+                if (distance2bb > -Scene::BevelSize){
+                    pPath->lineTo(me.rx() + Scene::BevelSize, bbY);
+                } else {
+                    pPath->lineTo(me.rx() + Scene::BevelSize, myBottomY + Scene::BevelSize);
+                }
+            }
+        }
+    } else if (diffY == 0){ // i am the bottom
+        distance2bb = bbY - myBottomY;
+        pPath->lineTo(me.rx() + Scene::BevelSize, myBottomY
+                      + (distance2bb > Scene::BevelSize ? Scene::BevelSize : distance2bb));
+    }
+    if (!lastbackbone){
+        pPath->moveTo(me.rx(), me.ry());
+        me.rx() += Scene::BackboneMargin;
+        pPath->lineTo(me.rx(), me.ry());
+    }
+}
+void EventItem::transitionRight(QPainterPath *pPath, QPointF me, qreal bbY, Backbone *pBB, bool lastbackbone){
+    pPath->lineTo(me.rx() + Scene::BevelSize, me.ry());
+    pPath->lineTo(me.rx() + Scene::BevelSize, bbY);
+    if (!lastbackbone){
+        me.rx() += Scene::BackboneMargin - Scene::BevelSize;
+        pPath->lineTo(me.rx(), me.ry());
+    }
+}
 void EventItem::updateTransitions (){
+//    if (m_Name == "kkkkk"){
+//        return;
+//    }
 	Log::Logger::debug("PAINT__", "EventItem::updateTransitions()");
 	QSet<int> idx_set;
     StateItem *pParentItem = qgraphicsitem_cast<StateItem*>(parentItem());//we need it to get some dimensions
@@ -94,31 +170,13 @@ void EventItem::updateTransitions (){
 				if (idx_set.contains(i)){
                     Backbone *pBb = backboneList.at(i);
                     pBb->setHover (m_Hover);
-                    QPointF bbstartoffset = mapFromItem(pStateItem, pStateItem->getBackboneStartOffset (pBb));
-                    qreal yEnd = mapFromItem (pBb, pBb->getEndPoint()).ry();
-					if (yEnd < y){//up
-						path.lineTo(x + Scene::BevelSize, y - Scene::BevelSize);
-                        path.lineTo(x + Scene::BevelSize, bbstartoffset.ry());
-						if (i != max_idx){
-							path.moveTo(x, y);
-							x += Scene::BackboneMargin;
-							path.lineTo(x, y);
-						}
-					} else if (yEnd > y){//down
-						path.lineTo(x + Scene::BevelSize, y + Scene::BevelSize);
-                        path.lineTo(x + Scene::BevelSize, bbstartoffset.ry());
-						if (i != max_idx){
-							path.moveTo(x, y);
-							x += Scene::BackboneMargin;
-							path.lineTo(x, y);
-						}
+                    qreal endBBY = mapFromItem(parentItem()->parentItem(), pBb->getEndPoint()).ry();
+                    if (endBBY < y){//up
+                        transitionUp (&path, QPointF (x, y), endBBY, pBb, i == max_idx);
+                    } else if (endBBY > y){//down
+                        transitionDown (&path, QPointF (x, y), endBBY, pBb, i == max_idx);
 					} else {//right
-						path.lineTo(x + Scene::BevelSize, y);
-                        path.lineTo(x + Scene::BevelSize, bbstartoffset.ry());
-						if (i != max_idx){
-							x += Scene::BackboneMargin - Scene::BevelSize;
-							path.lineTo(x, y);
-						}
+                        transitionRight(&path, QPointF (x, y), endBBY, pBb, i == max_idx);
 					}
 				} else {
                     bool collides = pParentItem->eventTransitionCollidesWithBackbone(this, i);

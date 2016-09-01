@@ -56,12 +56,12 @@ public:
     bool deserialize (QString str);
     static StateItem *createState (QDomElement *pNode);
     QFont *getFont() { return m_pFont; }
+    double getHY (const Backbone *pBackbone) const;
+    double getLY (const Backbone *pBackbone) const;
 private:
     bool containsTransition (QString endItemName) const ;
     void updateOutBackbones(bool position, bool transitions) const ;
     void updateInBackbones(bool position, bool transitions) const ;
-	double myHY (const Backbone *pBackbone) const;
-	double myLY (const Backbone *pBackbone) const;
 	int getOutgoingBackboneIndex(const Backbone *pBackbone) const;
 	const EventItem* getUpperEvent (QString endItemName) const;
 	const EventItem* getLowerEvent (QString endItemName) const;
