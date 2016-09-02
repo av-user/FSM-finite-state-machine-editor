@@ -29,7 +29,6 @@ public:
     bool isLoop () const;
 private:
 	void updatePath();
-    void updatePathUnbeveled(QPointF pointStart, QPointF pointEnd);
     void drawArrow (QPainterPath *pPath, QPointF pointStart, QPointF pointEnd);
     StateItem *m_pStartItem;
     const StateItem *m_pEndItem;

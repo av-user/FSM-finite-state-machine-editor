@@ -33,15 +33,11 @@ void Dialog::new_state(const QPointF& pos){
     if (stateDlg.result() == QDialog::Accepted){
         StateItem *pTi2 = new StateItem();
 		pTi2->setPos(pos);
-		int h = pTi2->getHeight();
         pTi2->setName(stateDlg.getName().toStdString().c_str());
         pTi2->setEvents(stateDlg.getEvents());
 		m_pScene->addItem(pTi2);
         m_pScene->addEventNames (stateDlg.getNewEvents());
 	}
-}
-void Dialog::test(const QPoint& pos){
-
 }
 void Dialog::contextMenuView(const QPoint& pos, const QPointF& posScene){
 	// for most widgets
@@ -65,7 +61,7 @@ void Dialog::contextMenuState(const QPoint& pos, StateItem *pItem){
 	QPoint globalPos = m_ui->graphicsView->mapToGlobal(pos);
 	// for QAbstractScrollArea and derived classes you would use:
 	// QPoint globalPos = myWidget->viewport()->mapToGlobal(pos);
-	QList<QString> menuList = pItem->getMenuList(pos);
+    QList<QString> menuList = pItem->getMenuList();
 	QMenu itemMenu;
 	foreach (const QString pStr, menuList){
 		itemMenu.addAction(pStr);
@@ -127,10 +123,6 @@ void Dialog::showContextMenu(const QPoint& pos){ // this is a slot
 		this->contextMenuView(pos, posScene);
 	} else {
 		QGraphicsItem *pItem = itemList.first();
-		int t = pItem->type();
-		int t0 = QGraphicsRectItem::Type;
-		int t1 = QGraphicsTextItem::Type;
-		int t2 = QGraphicsItem::Type;
         if (pItem->type() == StateItem::Type){
             this->contextMenuState(pos, qgraphicsitem_cast<StateItem*>(pItem));
 		} else if (pItem->type() == EventItem::Type){
@@ -213,14 +205,22 @@ void Dialog::on_pushButton_saveas_clicked(){
 void Dialog::on_pushButton_generate_one_clicked(){
     CodeGenerator codegen (CodeGenerator::Qt, "\n");
     codegen.setFilename(m_Filename);
-    bool ok = codegen.generate();
+    if (codegen.generate()){
+        ;// todo??
+    } else {
+        ;//todo??
+    }
 }
 void Dialog::on_pushButton_generate_all_clicked(){
     CodeGenerator codegen (CodeGenerator::Qt, "\n");
     QFileInfo fileinfo (m_Filename);
     QString path = fileinfo.absolutePath();
     codegen.setDirname(path);
-    bool ok = codegen.generate();
+    if (codegen.generate()){
+        ;//todo
+    } else {
+        ;//todo
+    }
 }
 void Dialog::on_pushButton_generate_lib_clicked(){
     CodeGenerator codegen (CodeGenerator::Qt, "\n");

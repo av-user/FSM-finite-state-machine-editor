@@ -206,13 +206,7 @@ StateItem::BackboneDirection StateItem::getBackboneDirection(const Backbone *pBa
 	}
 	return direction;
 }
-QPointF StateItem::getBackboneEnd(const Backbone *pBackbone) const{
-	QPointF	pnt;
-	pnt = this->pos();
-    pnt.ry() += Scene::RectRadius;
-	return pnt;
-}
-const QList<QString> StateItem::getMenuList(const QPoint& pos) const {
+const QList<QString> StateItem::getMenuList() const {
 	QList<QString> list;
 	list.append("Edit");
 	list.append("Delete");
@@ -536,7 +530,6 @@ StateItem::StateItem()
 , m_Unsensitivity	(3)
 , m_PositionChanged	(false)
 {
-	QGraphicsItem *p = this->parentItem();
 	setFlag(ItemIsMovable);
 	setFlag(QGraphicsItem::ItemSendsGeometryChanges);
 	m_pFont = new QFont ("times", 26);

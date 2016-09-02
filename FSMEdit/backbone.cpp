@@ -98,20 +98,6 @@ void Backbone::drawArrow (QPainterPath *pPath, QPointF pointStart, QPointF point
         }
     }
 }
-void Backbone::updatePathUnbeveled(QPointF pointStart, QPointF pointEnd){
-    QPainterPath myPath;
-    myPath.moveTo(pointStart);
-    QPointF pnt;
-    pnt.rx() = pointStart.rx();
-    pnt.ry() = pointEnd.ry();
-    if (pointEnd.rx() == pointStart.rx()){
-         myPath.lineTo(pnt.x(), pnt.y());
-    } else {
-        myPath.lineTo(pointEnd);
-    }
-    drawArrow(&myPath, pointStart, pointEnd);
-    setPath(myPath);
-}
 void Backbone::updatePath(){
 	if (m_pStartItem != NULL && m_pEndItem != NULL){
 		QPainterPath myPath;

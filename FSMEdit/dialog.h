@@ -46,7 +46,6 @@ private:
     void contextMenuState(const QPoint& pos, StateItem *pItem);
 	void contextMenuEventItem(const QPoint& pos, EventItem *pItem);
     void new_state(const QPointF& pos);
-	void test(const QPoint& pos);
 private:
 	Ui::Dialog *m_ui;
     QString             m_Filename;

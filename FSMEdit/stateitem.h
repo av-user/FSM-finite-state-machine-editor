@@ -35,14 +35,13 @@ public:
 	double getWidth () const;
 	double getHeight () const;
 	const QFont font() const { return *m_pFont; }
-	const QList<QString> getMenuList(const QPoint& pos) const;
+    const QList<QString> getMenuList() const;
 	void updateTransitions ();
 	QString getName() const { return m_Name;}
     QStringList getEventsList () const ;
     QList<EventItem*> getEvents();
 	QPointF getBackboneStartOffset(const Backbone *pBackbone) const;
 	QPointF getBackboneStartLow(const Backbone *pBackbone) const;
-	QPointF getBackboneEnd(const Backbone *pBackbone) const;
 	QString toString() const;
 	BackboneDirection getBackboneDirection(const Backbone *pBackbone) const;
 	int getOutBackboneIdx(QString endItemName);
