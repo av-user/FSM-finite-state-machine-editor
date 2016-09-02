@@ -8,9 +8,9 @@ There is a demo-project TestFSM, where a part of code (directory handlers/*) is 
 
 The TestFSM project is the prototype of the touch-screen terminal software.
 
-The prototype is implemented using Qt/Qml and finite-state machines (FSM). It consists of two applications, main application and central system simulator, supplemented with two libraries.
+The prototype is implemented using Qt/Qml and finite-state machines (FSM). It consists of two applications, main application and central system simulator.
 
-The main application created with Qt-Creator's "Qt Quick control application" template includes a GUI implemented in Qml and two FSMs running each in its own thread: "main" and "communication".
+The main application created with Qt-Creator's "Qt Quick control application" template includes a GUI implemented in Qml, supports internationalization, and contains two FSMs running each in its own thread: "main" and "communication".
 
 The main thread is responsible for general activities. The communication thread is responsible for maintaining the connection and message exchange with the central system (here simulated, see HostSim project). Further functionality extention is possible by adding more FSM-threads: i.e. to maintain payment (self-service terminals), scanning, printing tasks, etc.
 
