@@ -120,6 +120,7 @@ void Backbone::updatePath(){
         QPointF pointEnd = this->getEndPoint();
 		QPointF pnt;
         qreal diffY = pointEnd.ry() - pointStart.ry();
+        qreal diffX = pointEnd.rx() - pointStart.rx();
         if (diffY == 0.0){
             myPath.moveTo(pointStart.rx(), pointStart.ry());
         } else if (abs(diffY) < Scene::BevelSize){
@@ -127,7 +128,11 @@ void Backbone::updatePath(){
         } else if (diffY < -Scene::BevelSize*2){ // up
             myPath.moveTo(pointStart.rx(), pointStart.ry() - Scene::BevelSize);
             myPath.lineTo(pointStart.rx(), pointEnd.ry() + Scene::BevelSize);
-            myPath.lineTo(pointStart.rx() + Scene::BevelSize, pointEnd.ry());
+            if (diffX > 0){
+                myPath.lineTo(pointStart.rx() + Scene::BevelSize, pointEnd.ry());
+            } else if (diffX < 0){
+                myPath.lineTo(pointStart.rx() - Scene::BevelSize, pointEnd.ry());
+            }
         } else if (diffY < -Scene::BevelSize){ // "half up"
             myPath.moveTo(pointStart.rx(), pointStart.ry() - Scene::BevelSize);
             myPath.lineTo(pointStart.rx() - diffY - Scene::BevelSize, pointEnd.ry());
@@ -137,7 +142,11 @@ void Backbone::updatePath(){
         } else {
             myPath.moveTo(pointStart.rx(), pointStart.ry() + Scene::BevelSize);
             myPath.lineTo(pointStart.rx(), pointEnd.ry() - Scene::BevelSize);
-            myPath.lineTo(pointStart.rx() + Scene::BevelSize, pointEnd.ry());
+            if (diffX > 0){
+                myPath.lineTo(pointStart.rx() + Scene::BevelSize, pointEnd.ry());
+            } else if (diffX < 0){
+                myPath.lineTo(pointStart.rx() - Scene::BevelSize, pointEnd.ry());
+            }
         }
 		myPath.lineTo(pointEnd);
         drawArrow(&myPath, pointStart, pointEnd);
@@ -167,8 +176,6 @@ Backbone::Backbone(StateItem *pStartItem, StateItem *pEndItem)
 : m_pStartItem	(pStartItem)
 , m_pEndItem	(pEndItem)
 {
-//	pStartItem->addOutgoingBackbone (this);
-//	pEndItem->addIncomingBackbone(this);
     DefaultPen = pen();
     DefaultBrush = brush();
 	updatePath ();

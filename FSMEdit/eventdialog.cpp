@@ -52,7 +52,6 @@ QStringList EventDialog::getTransitions () const {
     return list;
 }
 void EventDialog::setStates (QStringList allStates, QStringList selectedStates) {
-//    this->m_ExistingStateNamesList = allStates;
     foreach (QString name, allStates) {
         if (selectedStates.contains(name)){
             ui->transitions2StatesListWidget->addItem(name);

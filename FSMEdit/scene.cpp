@@ -345,32 +345,4 @@ Scene::Scene(QObject *pParent)
 , m_Name ("noname")
 {
     setBackgroundBrush(Scene::BackgroundBrush);
-
-//    <state code="0" >Init</state>
-//                Request->ReplayJoker
-//    <state code="2">Terminate</state>
-//    <state code="1" >ActionLotto</state>
-//                Init->ActionLotto
-//                GuiEvent->ActionLotto
-//    <state code="3" >Host</state>
-//                HostResponse->Print
-//                Init->Print
-//                HostResponse->PromoTest
-//                HostResponse->PromoVoucher
-//                HostResponse->Terminate
-//    <state code="6" >Print</state>
-//                PrintSuccess->Terminate
-//                PrintSuccess->PromoWager
-//    <state code="4" >PromoText</state>
-//                HostResponse->Print
-//                HostResponse->PromoVoucher
-//                HostResponse->PromoText
-//    <state code="5" >PromoVoucher</state>
-//                PrintSuccess->Print
-//    <state code="7" >PromoWager</state>
-//                ActionResponse->Terminate
-//    <state code="8" >ReplayJoker</state>
-//                Init->Host
-//                GuiEvent->Host
-//                GuiEvent->ReplayJoker
 }

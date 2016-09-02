@@ -65,7 +65,7 @@ QString EventItem::serialize() const {
 Scene* EventItem::getScene() const {
 	return dynamic_cast<Scene*>(scene());
 }
-void EventItem::transitionUp (QPainterPath *pPath, QPointF me, qreal bbY, Backbone *pBB, bool lastbackbone){
+void EventItem::transitionUp (QPainterPath *pPath, QPointF me, qreal bbY, Backbone *pBB){
     StateItem *pStateItem = qgraphicsitem_cast<StateItem*>(parentItem());
     qreal myTopY = mapFromItem(parentItem()->parentItem(), QPointF(0, pStateItem->getHY(pBB))).ry();
     qreal diffY = myTopY - me.ry();
@@ -91,13 +91,8 @@ void EventItem::transitionUp (QPainterPath *pPath, QPointF me, qreal bbY, Backbo
         pPath->lineTo(me.rx() + Scene::BevelSize, myTopY
                       - (distance2bb > Scene::BevelSize ? Scene::BevelSize : distance2bb));
     }
-    if (!lastbackbone){
-        pPath->moveTo(me.rx(), me.ry());
-        me.rx() += Scene::BackboneMargin;
-        pPath->lineTo(me.rx(), me.ry());
-    }
 }
-void EventItem::transitionDown (QPainterPath *pPath, QPointF me, qreal bbY, Backbone *pBB, bool lastbackbone){
+void EventItem::transitionDown (QPainterPath *pPath, QPointF me, qreal bbY, Backbone *pBB){
     StateItem *pStateItem = qgraphicsitem_cast<StateItem*>(parentItem());
     qreal myBottomY = mapFromItem(parentItem()->parentItem(), QPointF(0, pStateItem->getLY(pBB))).ry();
     qreal diffY = myBottomY - me.ry();
@@ -124,24 +119,8 @@ void EventItem::transitionDown (QPainterPath *pPath, QPointF me, qreal bbY, Back
         pPath->lineTo(me.rx() + Scene::BevelSize, myBottomY
                       + (distance2bb > Scene::BevelSize ? Scene::BevelSize : distance2bb));
     }
-    if (!lastbackbone){
-        pPath->moveTo(me.rx(), me.ry());
-        me.rx() += Scene::BackboneMargin;
-        pPath->lineTo(me.rx(), me.ry());
-    }
-}
-void EventItem::transitionRight(QPainterPath *pPath, QPointF me, qreal bbY, Backbone *pBB, bool lastbackbone){
-    pPath->lineTo(me.rx() + Scene::BevelSize, me.ry());
-    pPath->lineTo(me.rx() + Scene::BevelSize, bbY);
-    if (!lastbackbone){
-        me.rx() += Scene::BackboneMargin - Scene::BevelSize;
-        pPath->lineTo(me.rx(), me.ry());
-    }
 }
 void EventItem::updateTransitions (){
-//    if (m_Name == "kkkkk"){
-//        return;
-//    }
 	Log::Logger::debug("PAINT__", "EventItem::updateTransitions()");
 	QSet<int> idx_set;
     StateItem *pParentItem = qgraphicsitem_cast<StateItem*>(parentItem());//we need it to get some dimensions
@@ -165,19 +144,21 @@ void EventItem::updateTransitions (){
 			path.moveTo(x, y);
 			x += linelen;
 			path.lineTo(x, y);
-            StateItem *pStateItem = qgraphicsitem_cast <StateItem*>(parentItem());
 			for (int i = 0; i <= max_idx; i++){
 				if (idx_set.contains(i)){
                     Backbone *pBb = backboneList.at(i);
                     pBb->setHover (m_Hover);
                     qreal endBBY = mapFromItem(parentItem()->parentItem(), pBb->getEndPoint()).ry();
-                    if (endBBY < y){//up
-                        transitionUp (&path, QPointF (x, y), endBBY, pBb, i == max_idx);
+                    if (endBBY <= y){//up
+                        transitionUp (&path, QPointF (x, y), endBBY, pBb);
                     } else if (endBBY > y){//down
-                        transitionDown (&path, QPointF (x, y), endBBY, pBb, i == max_idx);
-					} else {//right
-                        transitionRight(&path, QPointF (x, y), endBBY, pBb, i == max_idx);
+                        transitionDown (&path, QPointF (x, y), endBBY, pBb);
 					}
+                    if (i != max_idx){
+                        path.moveTo(x, y);
+                        x += Scene::BackboneMargin;
+                        path.lineTo(x, y);
+                    }
 				} else {
                     bool collides = pParentItem->eventTransitionCollidesWithBackbone(this, i);
 					if (collides){
@@ -243,7 +224,7 @@ void EventItem::setHover(){
         setPen (EventItem::BlackPen);
         setBrush(EventItem::DefaultBrush);
     }
-//    m_pTransition->setHover(m_Hover);
+    m_pTransition->setHover(m_Hover);
 }
 EventItem::EventItem(StateItem *pTi2, QString name, QFont &font)
 : QGraphicsRectItem (pTi2)
